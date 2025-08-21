@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  estimatedHours    Float?
+  actualHours       Float    @default(0)
+  startDate         DateTime?
+  endDate           DateTime?
+  completedAt       DateTime?
+  priority          Priority @default(MEDIUM)
+  status            Status   @default(ACTIVE)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  tasks             Task[]
+  
+  @@map("projects")
+}
+
+model Task {
+  id                String     @id @default(cuid())
+  title             String
+  description       String?
+  estimatedHours    Float?
+  actualHours       Float      @default(0)
+  priority          Priority   @default(MEDIUM)
+  status            TaskStatus @default(TODO)
+  dueDate           DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  
+  projectId         String?
+  project           Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  timeEntries       TimeEntry[]
+  
+  @@map("tasks")
+}
+
+model TimeEntry {
+  id          String   @id @default(cuid())
+  hours       Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  @@map("time_entries")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Status {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+}
+
