@@ -1,5 +1,3 @@
-"use client";
-
 export function TaskControls({
   filter,
   setFilter,
@@ -18,28 +16,48 @@ export function TaskControls({
 
   return (
     <div className="mb-6 flex flex-col items-start justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
-      <div className="flex space-x-2">
+      {/* Filter buttons with modern dark styling */}
+      <div className="relative flex space-x-1 rounded-2xl border border-gray-700/50 bg-gray-900/50 p-1 backdrop-blur-xl">
         {options.map((opt) => (
           <button
             key={opt}
             onClick={() => setFilter(opt)}
-            className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+            className={`group relative rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95 ${
               filter === opt
-                ? "bg-blue-600 text-white"
-                : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/15"
+                : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
             }`}
           >
-            {opt.charAt(0).toUpperCase() + opt.slice(1)}
+            {/* Active state background glow */}
+            {filter === opt && (
+              <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-blue-400/10 to-blue-600/10 blur-sm" />
+            )}
+
+            {/* Hover state background */}
+            {filter !== opt && (
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-700/20 to-gray-600/20 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+            )}
+
+            <span className="relative z-10">
+              {opt.charAt(0).toUpperCase() + opt.slice(1)}
+            </span>
           </button>
         ))}
       </div>
 
+      {/* New Task button with enhanced styling */}
       <button
         onClick={onNewTask}
-        className="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+        className="group relative flex items-center overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-500/15 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 active:scale-95"
       >
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-blue-300/10 to-blue-400/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+        {/* Shine effect on hover */}
+        <div className="absolute inset-0 translate-x-[-100%] -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-500 group-hover:translate-x-[200%]" />
+
         <svg
-          className="mr-2 h-5 w-5"
+          className="relative z-10 mr-2.5 h-5 w-5 transition-transform duration-200 group-hover:rotate-90"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -51,7 +69,7 @@ export function TaskControls({
             d="M12 4v16m8-8H4"
           />
         </svg>
-        New Task
+        <span className="relative z-10">New Task</span>
       </button>
     </div>
   );
