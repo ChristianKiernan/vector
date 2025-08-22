@@ -57,7 +57,7 @@ export function getDarkPriorityColor(priority: string): string {
     case "MEDIUM":
       return "text-yellow-400 bg-yellow-900/30 border border-yellow-800";
     case "LOW":
-      return "text-green-400 bg-green-900/30 border border-green-800";
+      return "text-purple-400 bg-purple-900/30 border border-purple-800";
     default:
       return "text-gray-400 bg-gray-800/50 border border-gray-700";
   }
@@ -67,9 +67,9 @@ export function getDarkStatusColor(status: string): string {
   switch (status) {
     case "COMPLETED":
       return "text-green-400 bg-green-900/30 border border-green-800";
-    case "IN_PROGRESS":
+    case "ACTIVE":
       return "text-blue-400 bg-blue-900/30 border border-blue-800";
-    case "TODO":
+    case "ARCHIVED":
       return "text-gray-400 bg-gray-800/50 border border-gray-700";
     default:
       return "text-gray-400 bg-gray-800/50 border border-gray-700";

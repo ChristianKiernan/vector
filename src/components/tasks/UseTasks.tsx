@@ -58,7 +58,6 @@ export function useTasks() {
 
   const updateStatus = useCallback(
     async (id: string, status: Task["status"]) => {
-      // optimistic update
       setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
 
       try {
