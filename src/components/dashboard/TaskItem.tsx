@@ -32,7 +32,7 @@ export function TaskItem({
             onChange={(e) =>
               onStatusChange(task.id, nextStatusForCheckbox(e.target.checked))
             }
-            className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-green-600 focus:ring-green-500"
             aria-label={
               task.status === "COMPLETED"
                 ? "Mark as not completed"

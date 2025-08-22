@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { Task, Project } from "@/types";
-import TaskForm from "@/components/TaskForm";
+import { TaskFormModal } from "@/components/tasks/TaskFormModal";
 import { useTasks } from "@/components/tasks/UseTasks";
 import { useProjects } from "@/components/projects/UseProjects";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -22,7 +22,7 @@ export default function Dashboard() {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
-  // ✅ Always call hooks
+  // Always call hooks before branching
   const { filteredTasks, completedCount, activeCount } = useMemo(() => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -37,6 +37,7 @@ export default function Dashboard() {
         : task.createdAt
           ? new Date(task.createdAt)
           : null;
+
       if (!taskDate) return filter === "all";
 
       switch (filter) {
@@ -65,10 +66,7 @@ export default function Dashboard() {
     };
   }, [tasks, filter]);
 
-  // ✅ Now branch in render instead of before the hook
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -112,16 +110,35 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* Task Modal */}
       {showTaskForm && (
-        <TaskForm
-          task={editingTask}
+        <TaskFormModal
+          open={showTaskForm}
+          onClose={() => {
+            setShowTaskForm(false);
+            setEditingTask(undefined);
+          }}
+          editingTask={editingTask}
           projects={projects as Project[]}
-          onSubmit={
-            editingTask
-              ? (data) => updateTask(editingTask.id, data)
-              : createTask
-          }
-          onCancel={() => {
+          onSubmit={async (form) => {
+            // Map form (strings) -> API payload (typed)
+            const payload: Partial<Task> = {
+              title: form.title,
+              description: form.description || undefined,
+              estimatedHours: form.estimatedHours
+                ? parseFloat(form.estimatedHours)
+                : undefined,
+              priority: form.priority,
+              dueDate: form.dueDate ? new Date(form.dueDate) : undefined,
+              projectId: form.projectId || undefined,
+            };
+
+            if (editingTask) {
+              await updateTask(editingTask.id, payload);
+            } else {
+              await createTask(payload);
+            }
+
             setShowTaskForm(false);
             setEditingTask(undefined);
           }}
