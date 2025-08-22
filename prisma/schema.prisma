@@ -37,7 +37,7 @@ model Task {
   estimatedHours    Float?
   actualHours       Float      @default(0)
   priority          Priority   @default(MEDIUM)
-  status            TaskStatus @default(TODO)
+  status            Status @default(ACTIVE)
   dueDate           DateTime?
   completedAt       DateTime?
   createdAt         DateTime   @default(now())
@@ -77,9 +77,4 @@ enum Status {
   ARCHIVED
 }
 
-enum TaskStatus {
-  TODO
-  IN_PROGRESS
-  COMPLETED
-}
 
