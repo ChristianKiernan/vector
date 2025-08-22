@@ -3,19 +3,21 @@
 import type { Task } from "@/types";
 import { TaskItem } from "./TaskItem";
 
+export type TaskListProps = {
+  tasks: Task[];
+  onEdit: (t: Task) => void;
+  onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: Task["status"]) => void;
+  title?: string;
+};
+
 export function TaskList({
   tasks,
   onEdit,
   onDelete,
   onStatusChange,
   title,
-}: {
-  tasks: Task[];
-  onEdit: (t: Task) => void;
-  onDelete: (id: string) => void;
-  onStatusChange: (id: string, status: Task["status"]) => void;
-  title?: string;
-}) {
+}: TaskListProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 shadow-xl backdrop-blur-sm">
       <div className="border-b border-gray-800 px-6 py-4">
