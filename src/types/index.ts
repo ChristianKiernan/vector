@@ -1,6 +1,7 @@
 export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 export type Status = "ACTIVE" | "COMPLETED" | "ARCHIVED";
-export type TaskStatus = "TODO" | "IN_PROGRESS" | "COMPLETED";
+export const FILTER_OPTIONS = ["all", "today", "week", "month"] as const;
+export type TaskFilter = (typeof FILTER_OPTIONS)[number];
 
 export interface Project {
   id: string;
@@ -25,7 +26,7 @@ export interface Task {
   estimatedHours?: number;
   actualHours: number;
   priority: Priority;
-  status: TaskStatus;
+  status: Status;
   dueDate?: Date;
   completedAt?: Date;
   createdAt: Date;

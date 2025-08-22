@@ -19,10 +19,10 @@ export default function Dashboard() {
     useTasks();
   const { projects } = useProjects();
   const [filter, setFilter] = useState<Filter>("all");
+  const [showActiveOnly, setShowActiveOnly] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
-  // Always call hooks before branching
   const { filteredTasks, completedCount, activeCount } = useMemo(() => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -55,16 +55,23 @@ export default function Dashboard() {
       }
     };
 
-    const ft = tasks.filter(withinFilter);
+    // Apply time-based filter first
+    let ft = tasks.filter(withinFilter);
+    
+    // Apply active-only filter if toggle is enabled
+    if (showActiveOnly) {
+      ft = ft.filter(task => task.status === "ACTIVE");
+    }
+
     const completed = ft.filter((t) => t.status === "COMPLETED").length;
-    const active = ft.filter((t) => t.status !== "COMPLETED").length;
+    const active = ft.filter((t) => t.status === "ACTIVE").length;
 
     return {
       filteredTasks: ft,
       completedCount: completed,
       activeCount: active,
     };
-  }, [tasks, filter]);
+  }, [tasks, filter, showActiveOnly]);
 
   if (loading) return <LoadingScreen />;
 
@@ -84,6 +91,8 @@ export default function Dashboard() {
           filter={filter}
           setFilter={setFilter}
           onNewTask={() => setShowTaskForm(true)}
+          showActiveOnly={showActiveOnly}
+          setShowActiveOnly={setShowActiveOnly}
         />
 
         {filteredTasks.length === 0 ? (

@@ -78,7 +78,7 @@ export function useTasks() {
             t.id === id
               ? {
                   ...t,
-                  status: t.status === "COMPLETED" ? "TODO" : "COMPLETED",
+                  status: t.status === "COMPLETED" ? "ACTIVE" : "COMPLETED",
                 }
               : t,
           ),
