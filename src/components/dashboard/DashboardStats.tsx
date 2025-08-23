@@ -1,4 +1,4 @@
-import StatsCard from "@/components/StatsCard";
+import StatsCard from "@/components/dashboard/StatsCard";
 import type { LucideIcon } from "lucide-react";
 import { ListChecks, CheckCircle2, Clock, FolderKanban } from "lucide-react";
 
