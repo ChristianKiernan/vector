@@ -29,7 +29,7 @@ export type TasksInlineFiltersProps = {
   setDue: (d: TaskDueFilter) => void;
   priority: PriorityFilter;
   setPriority: (p: PriorityFilter) => void;
-  className?: string; // <-- NEW
+  className?: string; 
 };
 
 const PRIORITY_OPTS: PriorityFilter[] = [

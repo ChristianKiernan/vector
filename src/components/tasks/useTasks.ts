@@ -72,7 +72,6 @@ export function useTasks() {
         return saved;
       } catch (e) {
         console.error(e);
-        // rollback if failed
         setTasks((prev) =>
           prev.map((t) =>
             t.id === id

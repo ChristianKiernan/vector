@@ -51,7 +51,7 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  /** Adds a spinner & disables the button */
+  // Adds a spinner & disables the button 
   loading?: boolean;
 }
 

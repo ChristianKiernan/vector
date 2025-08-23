@@ -23,40 +23,36 @@ type NavItem = {
   icon: LucideIcon;
 };
 
-export function SideBar({ className = "" }: SidebarProps) {
+export function Sidebar({ className = "" }: SidebarProps) {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false); // same default on server & client
 
-  const navigationItems: NavItem[] = [
+  const items: NavItem[] = [
     { name: "Home", href: "/", icon: HomeIcon },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
     { name: "Projects", href: "/projects", icon: FolderKanban },
   ];
 
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
+  const isActive = (href: string) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <div className={`relative ${className}`}>
-      {/* Sidebar container:
-          - Mobile: full width, auto height
-          - Desktop: full height, collapsible width (md:w-64 or md:w-20) */}
       <div
         className={`group relative flex h-auto w-full flex-col bg-gradient-to-b from-gray-900 via-gray-900 to-slate-900 shadow-2xl backdrop-blur-xl transition-all duration-300 md:h-screen ${isCollapsed ? "md:w-20" : "md:w-64"} `}
       >
-        {/* Subtle gradient overlay */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5" />
 
         {/* Header */}
         <div className="relative flex items-center justify-between border-b border-gray-700/50 p-4 sm:p-6">
-          {/* Brand (hide label when collapsed on md+) */}
           <div className="flex items-center space-x-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/25">
               <span className="text-sm font-bold text-white">P</span>
             </div>
+            {/* Hide label only when collapsed on md+; always show on mobile */}
             <h1
               className={`bg-gradient-to-r from-white via-blue-50 to-gray-100 bg-clip-text text-base font-bold text-transparent sm:text-lg ${isCollapsed ? "hidden md:block md:opacity-0" : "block"} md:transition-opacity md:duration-200`}
             >
@@ -79,37 +75,30 @@ export function SideBar({ className = "" }: SidebarProps) {
           </button>
         </div>
 
-        {/* Navigation */}
+        {/* Nav */}
         <nav className="relative flex-1 space-y-2 p-3 sm:p-4">
-          {navigationItems.map((item) => {
-            const active = isActive(item.href);
-            const Icon = item.icon;
-
+          {items.map(({ name, href, icon: Icon }) => {
+            const active = isActive(href);
             return (
               <Link
-                key={item.name}
-                href={item.href}
+                key={name}
+                href={href}
                 className={`group/item relative flex items-center rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
                   active
                     ? "bg-gradient-to-r from-blue-500/20 to-blue-600/10 text-blue-300 shadow-lg shadow-blue-500/10"
                     : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
                 } `}
               >
-                {/* Active state background glow */}
                 {active && (
                   <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-r from-blue-400/10 to-blue-600/5 blur-sm" />
                 )}
-
-                {/* Active state indicator (desktop only, since top bar on mobile) */}
+                {/* left indicator only on desktop (top bar on mobile) */}
                 {active && (
                   <div className="absolute top-1/2 left-0 hidden h-8 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-lg shadow-blue-500/25 md:block" />
                 )}
 
-                {/* Icon + label */}
                 <div
-                  className={`flex items-center ${
-                    isCollapsed ? "justify-center" : "space-x-3"
-                  }`}
+                  className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"}`}
                 >
                   <Icon
                     className={`h-5 w-5 transition-colors duration-200 ${
@@ -119,18 +108,17 @@ export function SideBar({ className = "" }: SidebarProps) {
                     }`}
                     aria-hidden="true"
                   />
-                  {/* Hide text when collapsed on desktop – always show on mobile top bar */}
                   <span
                     className={`relative z-10 transition-opacity duration-200 ${isCollapsed ? "hidden md:inline-block md:opacity-0" : "inline-block"} `}
                   >
-                    {item.name}
+                    {name}
                   </span>
                 </div>
 
-                {/* Tooltip when collapsed (desktop only) */}
+                {/* Tooltip on collapse (desktop only) */}
                 {isCollapsed && (
                   <div className="absolute left-full z-20 ml-3 hidden rounded-xl bg-gray-800 px-3 py-2 text-sm text-white shadow-xl md:group-hover/item:block">
-                    {item.name}
+                    {name}
                     <div className="absolute top-1/2 right-full -translate-y-1/2 border-4 border-transparent border-r-gray-800" />
                   </div>
                 )}
@@ -142,18 +130,13 @@ export function SideBar({ className = "" }: SidebarProps) {
         {/* Footer */}
         <div className="relative border-t border-gray-700/50 p-4">
           <div
-            className={`flex items-center ${
-              isCollapsed ? "justify-center" : "space-x-3"
-            }`}
+            className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"}`}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-gray-600 to-gray-700">
               <span className="text-xs font-medium text-white">U</span>
             </div>
-            {/* Hide details when collapsed on desktop; visible on mobile */}
             <div
-              className={`min-w-0 ${
-                isCollapsed ? "hidden md:block md:opacity-0" : "block"
-              }`}
+              className={`${isCollapsed ? "hidden md:block md:opacity-0" : "block"} min-w-0`}
             >
               <p className="truncate text-sm font-medium text-white">
                 User Name

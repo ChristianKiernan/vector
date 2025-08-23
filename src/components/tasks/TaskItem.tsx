@@ -6,7 +6,7 @@ import {
   formatHours,
   getDarkPriorityColor,
   getDarkStatusColor,
-  cn, // assuming you export cn from "@/lib/utils"
+  cn,
 } from "@/lib/utils";
 import { IconButton } from "../Button";
 import {
@@ -122,6 +122,12 @@ export function TaskItem({
                 {task.status.replace("_", " ")}
               </span>
 
+              {task.project && (
+                <span className="rounded border border-blue-800 bg-blue-900/30 px-2 py-1 text-xs text-blue-400">
+                  {task.project.name}
+                </span>
+              )}
+
               {task.estimatedHours && (
                 <span className="text-xs text-gray-400">
                   Estimated time: {formatHours(task.estimatedHours)}
@@ -131,12 +137,6 @@ export function TaskItem({
               {task.dueDate && (
                 <span className="text-xs text-gray-400">
                   Due: {formatDate(new Date(task.dueDate))}
-                </span>
-              )}
-
-              {task.project && (
-                <span className="rounded border border-blue-800 bg-blue-900/30 px-2 py-1 text-xs text-blue-400">
-                  {task.project.name}
                 </span>
               )}
             </div>
