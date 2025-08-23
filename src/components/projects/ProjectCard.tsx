@@ -7,179 +7,187 @@ import {
   getDarkStatusColor,
 } from "@/lib/utils";
 import type { Project } from "@/types";
+import { IconButton } from "@/components/Button";
+import {
+  Pencil,
+  Trash2,
+  Clock,
+  ListChecks,
+  Rocket,
+  CalendarDays,
+  Archive,
+  ArchiveRestore,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+export type ProjectCardProps = {
+  project: Project;
+  onEdit: (p: Project) => void;
+  onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: Project["status"]) => void;
+};
 
 export function ProjectCard({
   project,
   onEdit,
   onDelete,
-}: {
-  project: Project;
-  onEdit: (p: Project) => void;
-  onDelete: (id: string) => void;
-}) {
+  onStatusChange,
+}: ProjectCardProps) {
+  const isArchived = project.status === "ARCHIVED";
+
   return (
-    <div className="group hover:shadow-3xl relative overflow-hidden rounded-2xl border border-gray-700/50 bg-gradient-to-br from-gray-900/90 via-gray-900/95 to-slate-900/90 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-gray-600/50 hover:shadow-blue-500/10">
-      {/* Subtle gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    <div
+      className={`h-full rounded-xl border border-gray-800 bg-gray-900/50 p-4 shadow-xl backdrop-blur-sm transition-transform duration-200 hover:scale-[1.01] sm:p-5 lg:p-6 ${
+        isArchived ? "opacity-90" : ""
+      }`}
+    >
+      {/* Header row (stacks on small screens) */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="break-words text-lg font-semibold text-white line-clamp-2 sm:text-xl">
+            {project.name}
+          </h3>
+          {project.description && (
+            <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-gray-400 sm:line-clamp-2">
+              {project.description}
+            </p>
+          )}
+        </div>
 
-      {/* Animated border effect */}
-      <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-30" />
-
-      <div className="relative p-6">
-        {/* Header Section */}
-        <div className="mb-5 flex items-start justify-between">
-          <div className="min-w-0 flex-1">
-            <h3 className="mb-1 truncate bg-gradient-to-r from-white via-blue-50 to-gray-100 bg-clip-text text-xl font-bold text-white">
-              {project.name}
-            </h3>
-            {project.description && (
-              <p className="line-clamp-2 text-sm leading-relaxed text-gray-300">
-                {project.description}
-              </p>
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">
+          {/* Archive / Restore */}
+          <IconButton
+            label={isArchived ? "Restore project" : "Archive project"}
+            variant="ghost"
+            className="text-gray-400 hover:text-amber-400"
+            onClick={() =>
+              onStatusChange(project.id, isArchived ? "ACTIVE" : "ARCHIVED")
+            }
+            title={isArchived ? "Restore project" : "Archive project"}
+          >
+            {isArchived ? (
+              <ArchiveRestore className="h-4 w-4" />
+            ) : (
+              <Archive className="h-4 w-4" />
             )}
-          </div>
+          </IconButton>
 
-          <div className="ml-4 flex space-x-2">
-            <button
-              onClick={() => onEdit(project)}
-              className="group/btn relative rounded-xl p-2.5 text-gray-400 transition-all duration-200 hover:scale-110 hover:bg-blue-500/10 hover:text-blue-400 active:scale-95"
-              aria-label="Edit project"
-            >
-              <div className="absolute inset-0 rounded-xl bg-blue-500/20 opacity-0 transition-opacity duration-200 group-hover/btn:opacity-100" />
-              <svg
-                className="relative z-10 h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-            </button>
+          <IconButton
+            label="Edit project"
+            variant="ghost"
+            className="text-gray-400 hover:text-blue-400"
+            onClick={() => onEdit(project)}
+            title="Edit project"
+          >
+            <Pencil className="h-4 w-4" />
+          </IconButton>
 
-            <button
-              onClick={() => onDelete(project.id)}
-              className="group/btn relative rounded-xl p-2.5 text-gray-400 transition-all duration-200 hover:scale-110 hover:bg-red-500/10 hover:text-red-400 active:scale-95"
-              aria-label="Delete project"
-            >
-              <div className="absolute inset-0 rounded-xl bg-red-500/20 opacity-0 transition-opacity duration-200 group-hover/btn:opacity-100" />
-              <svg
-                className="relative z-10 h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-            </button>
-          </div>
+          <IconButton
+            label="Delete project"
+            variant="ghost"
+            className="text-gray-400 hover:text-red-400"
+            onClick={() => onDelete(project.id)}
+            title="Delete project"
+          >
+            <Trash2 className="h-4 w-4" />
+          </IconButton>
         </div>
+      </div>
 
-        {/* Status badges with enhanced styling */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span
-              className={`relative inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:scale-105 ${getDarkPriorityColor(project.priority)}`}
-            >
-              <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/5 to-white/10" />
-              <span className="relative">Priority: {project.priority}</span>
-            </span>
+      {/* Badges (wrap neatly) */}
+      <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold sm:text-xs ${getDarkPriorityColor(
+            project.priority,
+          )}`}
+        >
+          Priority: {project.priority}
+        </span>
 
-            <span
-              className={`relative inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-200 hover:scale-105 ${getDarkStatusColor(project.status)}`}
-            >
-              <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/5 to-white/10" />
-              <span className="relative flex items-center">
-                <span className="mr-2 h-2 w-2 animate-pulse rounded-full bg-current" />
-                {project.status}
-              </span>
-            </span>
-          </div>
-        </div>
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold sm:text-xs ${getDarkStatusColor(
+            project.status,
+          )}`}
+        >
+          {project.status}
+        </span>
+      </div>
 
-        {/* Enhanced metrics grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {project.estimatedHours && (
-            <MetricCard
-              icon="⏱️"
-              label="Estimated Time"
-              value={formatHours(project.estimatedHours)}
-              accent="blue"
-            />
-          )}
-
-          <MetricCard
-            icon="📋"
-            label="Tasks"
-            value={String(project.tasks?.length ?? 0)}
-            accent="purple"
+      {/* Metrics (1 col on mobile → 2 cols on sm+) */}
+      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+        {project.estimatedHours && (
+          <MetricItem
+            icon={Clock}
+            label="Estimated"
+            value={formatHours(project.estimatedHours)}
+            tint="blue"
           />
+        )}
 
-          {project.startDate && (
-            <MetricCard
-              icon="🚀"
-              label="Started"
-              value={formatDate(new Date(project.startDate))}
-              accent="cyan"
-            />
-          )}
+        <MetricItem
+          icon={ListChecks}
+          label="Tasks"
+          value={String(project.tasks?.length ?? 0)}
+          tint="purple"
+        />
 
-          {project.endDate && (
-            <MetricCard
-              icon="🎯"
-              label="Due"
-              value={formatDate(new Date(project.endDate))}
-              accent="orange"
-            />
-          )}
-        </div>
+        {project.startDate && (
+          <MetricItem
+            icon={Rocket}
+            label="Started"
+            value={formatDate(new Date(project.startDate))}
+            tint="cyan"
+          />
+        )}
+
+        {project.endDate && (
+          <MetricItem
+            icon={CalendarDays}
+            label="Due"
+            value={formatDate(new Date(project.endDate))}
+            tint="orange"
+          />
+        )}
       </div>
     </div>
   );
 }
 
-function MetricCard({ 
-  icon, 
-  label, 
-  value, 
-  accent 
-}: { 
-  icon: string;
-  label: string; 
-  value: string;
-  accent: 'blue' | 'green' | 'purple' | 'cyan' | 'orange';
-}) {
-  const accentColors = {
-    blue: 'from-blue-500/10 to-blue-600/5 border-blue-500/20 group-hover:border-blue-400/30',
-    green: 'from-green-500/10 to-emerald-600/5 border-green-500/20 group-hover:border-green-400/30',
-    purple: 'from-yellow-500/10 to-yellow-600/5 border-yellow-500/20 group-hover:border-yellow-400/30',
-    cyan: 'from-cyan-500/10 to-teal-600/5 border-cyan-500/20 group-hover:border-cyan-400/30',
-    orange: 'from-orange-500/10 to-amber-600/5 border-orange-500/20 group-hover:border-orange-400/30',
-  };
+/* ---------------- MetricItem ---------------- */
+type MetricTint = "blue" | "green" | "purple" | "cyan" | "orange";
 
+const tintStyles: Record<MetricTint, string> = {
+  blue: "bg-blue-500/10 text-blue-300",
+  green: "bg-emerald-500/10 text-emerald-300",
+  purple: "bg-violet-500/10 text-violet-300",
+  cyan: "bg-cyan-500/10 text-cyan-300",
+  orange: "bg-amber-500/10 text-amber-300",
+};
+
+function MetricItem({
+  icon: Icon,
+  label,
+  value,
+  tint,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  tint: MetricTint;
+}) {
   return (
-    <div className={`group relative rounded-xl border bg-gradient-to-br p-3 transition-all duration-200 hover:scale-105 ${accentColors[accent]}`}>
-      <div className="flex items-center space-x-2 mb-1">
-        <span className="text-sm">{icon}</span>
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+    <div className="flex h-full items-center justify-between rounded-lg border border-gray-800 p-3 sm:block">
+      <div className="flex items-center gap-2 sm:mb-1">
+        <div
+          className={`flex h-7 w-7 items-center justify-center rounded-md sm:h-8 sm:w-8 ${tintStyles[tint]}`}
+        >
+          <Icon className="block h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+        </div>
+        <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
           {label}
         </span>
       </div>
-      <div className="font-bold text-white text-sm">
-        {value}
-      </div>
-      
-      {/* Subtle shine effect */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="text-sm font-semibold text-white sm:text-base">{value}</div>
     </div>
   );
 }

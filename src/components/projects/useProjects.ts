@@ -3,13 +3,26 @@
 import { useEffect, useState, useCallback } from "react";
 import type { Project, Priority } from "@/types";
 
-type UpsertPayload = {
+// Payload for creating a project 
+type CreateProjectPayload = {
   name: string;
+  priority: Priority;
   description?: string;
   estimatedHours?: number;
-  priority: Priority;
   startDate?: string;
   endDate?: string;
+  status?: Project["status"];
+};
+
+// Payload for updating a project (partial, including status)
+type UpdateProjectPayload = {
+  name?: string;
+  priority?: Priority;
+  description?: string;
+  estimatedHours?: number;
+  startDate?: string;
+  endDate?: string;
+  status?: Project["status"];
 };
 
 export function useProjects() {
@@ -30,27 +43,27 @@ export function useProjects() {
     fetchProjects();
   }, [fetchProjects]);
 
-  const createProject = useCallback(async (payload: UpsertPayload) => {
+  const createProject = useCallback(async (payload: CreateProjectPayload) => {
     const res = await fetch("/api/projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
     if (!res.ok) return;
-    const saved = await res.json();
+    const saved: Project = await res.json();
     setProjects((prev) => [saved, ...prev]);
     return saved;
   }, []);
 
   const updateProject = useCallback(
-    async (id: string, payload: UpsertPayload) => {
+    async (id: string, payload: UpdateProjectPayload) => {
       const res = await fetch(`/api/projects/${id}`, {
-        method: "PUT",
+        method: "PUT", // if your API supports PATCH, you can switch to PATCH here
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       if (!res.ok) return;
-      const saved = await res.json();
+      const saved: Project = await res.json();
       setProjects((prev) => prev.map((p) => (p.id === id ? saved : p)));
       return saved;
     },
@@ -68,6 +81,12 @@ export function useProjects() {
     return true;
   }, []);
 
+  // Helper 
+  const setProjectStatus = useCallback(
+    (id: string, status: Project["status"]) => updateProject(id, { status }),
+    [updateProject],
+  );
+
   return {
     projects,
     loading,
@@ -75,5 +94,6 @@ export function useProjects() {
     createProject,
     updateProject,
     deleteProject,
+    setProjectStatus, 
   };
 }

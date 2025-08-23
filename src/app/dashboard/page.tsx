@@ -1,85 +1,59 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Task, Project } from "@/types";
+import { useTasks } from "@/components/tasks/useTasks";
+import { useProjects } from "@/components/projects/useProjects";
 import { TaskFormModal } from "@/components/tasks/TaskFormModal";
-import { useTasks } from "@/components/tasks/UseTasks";
-import { useProjects } from "@/components/projects/UseProjects";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
-import { TaskControls } from "@/components/dashboard/TaskControls";
-import { TaskList } from "@/components/dashboard/TaskList";
-import { EmptyTasks } from "@/components/dashboard/EmptyTasks";
-import { LoadingScreen } from "@/components/projects/LoadingScreen";
+import { TaskItem } from "@/components/tasks/TaskItem";
+import { Button } from "@/components/Button";
+import { Plus, ClipboardList } from "lucide-react";
 
-type Filter = "all" | "today" | "week" | "month";
-
-export default function Dashboard() {
+import {
+  filterTasks,
+  type StatusFilter,
+  type TaskDueFilter,
+  type PriorityFilter,
+} from "@/lib/filters";
+import { LoadingScreen } from "@/components/LoadingScreen";
+import { TasksInlineFilters } from "@/components/tasks/TasksInlineFilters";
+export default function DashboardPage() {
   const { tasks, loading, createTask, updateTask, deleteTask, updateStatus } =
     useTasks();
   const { projects } = useProjects();
-  const [filter, setFilter] = useState<Filter>("all");
-  const [showActiveOnly, setShowActiveOnly] = useState(false);
+
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
-  const { filteredTasks, completedCount, activeCount } = useMemo(() => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const weekStart = new Date(
-      today.getTime() - today.getDay() * 24 * 60 * 60 * 1000,
-    );
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all"); // "all" | "active" | "completed"
+  const [dueFilter, setDueFilter] = useState<TaskDueFilter>("all"); // "all" | "overdue" | "today" | "week" | "noDueDate"
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all"); // "all" | "LOW" | "MEDIUM" | "HIGH"
 
-    const withinFilter = (task: Task) => {
-      const taskDate = task.dueDate
-        ? new Date(task.dueDate)
-        : task.createdAt
-          ? new Date(task.createdAt)
-          : null;
+  const filteredTasks = useMemo(
+    () =>
+      filterTasks(tasks, {
+        due: dueFilter,
+        status: statusFilter,
+        priority: priorityFilter,
+      }),
+    [tasks, dueFilter, statusFilter, priorityFilter],
+  );
 
-      if (!taskDate) return filter === "all";
+  const completedCount = filteredTasks.filter(
+    (t) => t.status === "COMPLETED",
+  ).length;
+  const activeCount = filteredTasks.filter(
+    (t) => t.status !== "COMPLETED",
+  ).length;
 
-      switch (filter) {
-        case "today":
-          return (
-            taskDate >= today &&
-            taskDate < new Date(today.getTime() + 24 * 60 * 60 * 1000)
-          );
-        case "week":
-          return taskDate >= weekStart;
-        case "month":
-          return taskDate >= monthStart;
-        default:
-          return true;
-      }
-    };
-
-    // Apply time-based filter first
-    let ft = tasks.filter(withinFilter);
-    
-    // Apply active-only filter if toggle is enabled
-    if (showActiveOnly) {
-      ft = ft.filter(task => task.status === "ACTIVE");
-    }
-
-    const completed = ft.filter((t) => t.status === "COMPLETED").length;
-    const active = ft.filter((t) => t.status === "ACTIVE").length;
-
-    return {
-      filteredTasks: ft,
-      completedCount: completed,
-      activeCount: active,
-    };
-  }, [tasks, filter, showActiveOnly]);
-
-  if (loading) return <LoadingScreen />;
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-950">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <DashboardHeader />
-
         <DashboardStats
           total={filteredTasks.length}
           completed={completedCount}
@@ -87,36 +61,65 @@ export default function Dashboard() {
           projects={projects.length}
         />
 
-        <TaskControls
-          filter={filter}
-          setFilter={setFilter}
-          onNewTask={() => setShowTaskForm(true)}
-          showActiveOnly={showActiveOnly}
-          setShowActiveOnly={setShowActiveOnly}
-        />
+        <div className="overflow-visible rounded-xl border border-gray-800 bg-gray-900/50 shadow-xl backdrop-blur-sm">
+          {/* Header */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 px-6 py-4">
+            <h2 className="text-lg font-semibold text-white">Tasks</h2>
 
-        {filteredTasks.length === 0 ? (
-          <EmptyTasks filter={filter} />
-        ) : (
-          <TaskList
-            tasks={filteredTasks}
-            onEdit={(t) => {
-              setEditingTask(t);
-              setShowTaskForm(true);
-            }}
-            onDelete={deleteTask}
-            onStatusChange={updateStatus}
-            title={
-              filter === "all"
-                ? "All Tasks"
-                : filter === "today"
-                  ? "Today's Tasks"
-                  : filter === "week"
-                    ? "This Week's Tasks"
-                    : "This Month's Tasks"
-            }
-          />
-        )}
+            <div className="flex flex-wrap items-center gap-3">
+              <TasksInlineFilters
+                status={statusFilter}
+                setStatus={setStatusFilter}
+                due={dueFilter}
+                setDue={setDueFilter}
+                priority={priorityFilter}
+                setPriority={setPriorityFilter}
+                className="mr-2 md:mr-4"
+              />
+              <Button variant="primary" size="sm" onClick={() => setShowTaskForm(true)}>
+                <Plus className="h-4 w-4" />
+                New Task
+              </Button>
+            </div>
+          </div>
+
+          {/* Content */}
+          {filteredTasks.length === 0 ? (
+            <div className="px-6 py-16 text-center">
+              <ClipboardList
+                className="mx-auto block h-12 w-12 text-gray-600"
+                aria-hidden="true"
+              />
+              <h3 className="mt-3 text-sm font-medium text-white">
+                No tasks match
+              </h3>
+              <p className="mt-1 text-sm text-gray-400">
+                Try changing or clearing filters, or create a new task.
+              </p>
+              <div className="mt-6">
+                <Button variant="primary" onClick={() => setShowTaskForm(true)}>
+                  <Plus className="h-4 w-4" />
+                  Create Task
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-800 p-0">
+              {filteredTasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onEdit={(t) => {
+                    setEditingTask(t);
+                    setShowTaskForm(true);
+                  }}
+                  onDelete={deleteTask}
+                  onStatusChange={updateStatus}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Task Modal */}
@@ -130,7 +133,6 @@ export default function Dashboard() {
           editingTask={editingTask}
           projects={projects as Project[]}
           onSubmit={async (form) => {
-            // Map form (strings) -> API payload (typed)
             const payload: Partial<Task> = {
               title: form.title,
               description: form.description || undefined,

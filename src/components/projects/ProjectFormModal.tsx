@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Project, Priority } from "@/types";
+import { Button } from "../Button";
 
 type FormShape = {
   name: string;
@@ -153,19 +154,17 @@ export function ProjectFormModal({
 
           {/* actions */}
           <div className="flex justify-end space-x-3 pt-6">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={onClose}
-              className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-gray-300 transition-colors hover:bg-gray-700"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-purple-700"
             >
               {editingProject ? "Update Project" : "Create Project"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
