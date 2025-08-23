@@ -20,34 +20,6 @@ export function formatHours(hours: number): string {
   return `${hours.toFixed(1)}h`;
 }
 
-export function getPriorityColor(priority: string): string {
-  switch (priority) {
-    case "URGENT":
-      return "text-red-600 bg-red-100";
-    case "HIGH":
-      return "text-orange-600 bg-orange-100";
-    case "MEDIUM":
-      return "text-yellow-600 bg-yellow-100";
-    case "LOW":
-      return "text-green-600 bg-green-100";
-    default:
-      return "text-gray-600 bg-gray-100";
-  }
-}
-
-export function getStatusColor(status: string): string {
-  switch (status) {
-    case "COMPLETED":
-      return "text-green-600 bg-green-100";
-    case "IN_PROGRESS":
-      return "text-blue-600 bg-blue-100";
-    case "TODO":
-      return "text-gray-600 bg-gray-100";
-    default:
-      return "text-gray-600 bg-gray-100";
-  }
-}
-
 export function getDarkPriorityColor(priority: string): string {
   switch (priority) {
     case "URGENT":
@@ -63,15 +35,16 @@ export function getDarkPriorityColor(priority: string): string {
   }
 }
 
-export function getDarkStatusColor(status: string): string {
+export function getDarkStatusColor(status: string) {
   switch (status) {
-    case "COMPLETED":
-      return "text-green-400 bg-green-900/30 border border-green-800";
     case "ACTIVE":
-      return "text-blue-400 bg-blue-900/30 border border-blue-800";
+      return "text-blue-300 bg-blue-500/10";
+    case "COMPLETED":
+      return "text-emerald-300 bg-emerald-500/10";
     case "ARCHIVED":
-      return "text-gray-400 bg-gray-800/50 border border-gray-700";
+      return "text-amber-300 bg-amber-500/10";
     default:
-      return "text-gray-400 bg-gray-800/50 border border-gray-700";
+      return "text-gray-300 bg-gray-700/30";
   }
 }
+

@@ -1,7 +1,5 @@
 export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 export type Status = "ACTIVE" | "COMPLETED" | "ARCHIVED";
-export const FILTER_OPTIONS = ["all", "today", "week", "month"] as const;
-export type TaskFilter = (typeof FILTER_OPTIONS)[number];
 
 export interface Project {
   id: string;
